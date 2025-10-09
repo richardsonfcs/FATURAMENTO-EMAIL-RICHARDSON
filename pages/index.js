@@ -10,6 +10,7 @@ export default function Home() {
   const [arquivo, setArquivo] = useState(null);
   const [previewHtml, setPreviewHtml] = useState("");
 
+  // Converte PDF em base64
   const fileToBase64 = (file) =>
     new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -18,14 +19,17 @@ export default function Home() {
       reader.onerror = (err) => reject(err);
     });
 
+  // Gera HTML do template selecionado
   const gerarHtml = async () => {
+    // fetch para /public/templates/
     const res = await fetch(`/templates/${template}.html`);
     let html = await res.text();
 
     html = html
       .replace(/{{ \$json\.clientName }}/g, clientName)
       .replace(/{{ \$json\.reportData\.totalValue\.toFixed\(2\)\.replace\('\.', ','\) }}/g, valor)
-      .replace(/{{ \$now\.minus\({ months: 1 }\)\.setLocale\('pt-BR'\)\.toFormat\("MMMM 'de' yyyy"\) }}/g, new Date().toLocaleString("pt-BR", { month: "long", year: "numeric" }))
+      .replace(/{{ \$now\.minus\({ months: 1 }\)\.setLocale\('pt-BR'\)\.toFormat\("MMMM 'de' yyyy"\) }}/g,
+        new Date().toLocaleString("pt-BR", { month: "long", year: "numeric" }))
       .replace(/{{ mensagem_adicional }}/g, mensagem);
 
     setPreviewHtml(html);
