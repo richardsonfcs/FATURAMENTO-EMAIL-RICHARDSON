@@ -32,7 +32,6 @@ const gerarHtml = async (dados) => {
   .replace(/{{\s*contato\s*}}/g, dados.email)
   .replace(/{{\s*periodo\s*}}/g, dados.periodo || new Date().toLocaleString("pt-BR", { month: "long", year: "numeric" }))
   .replace(/{{\s*mensagem_adicional\s*}}/g, dados.mensagem);
-
   setPreviewHtml(html);
   return html;
 };
