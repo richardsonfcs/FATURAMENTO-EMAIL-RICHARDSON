@@ -1,21 +1,23 @@
+}
 import { Resend } from 'resend';
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export default async function handler(req, res) {
-  const { to, subject, html, fileName, fileContent } = req.body;
+  if (req.method !== 'POST') {
+    return res.status(405).json({ message: 'Método não permitido' });
+  }
 
   try {
+    const { to, subject, text } = req.body;
     const data = await resend.emails.send({
-      from: process.env.FROM_EMAIL,
+      from: 'clinica@seu-dominio.com',
       to,
       subject,
-      html,
-      attachments: fileName
-        ? [{ filename: fileName, content: fileContent, encoding: 'base64' }]
-        : []
+      text,
     });
-    res.status(200).json({ ok: true, data });
+    res.status(200).json(data);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(400).json({ error });
   }
 }
