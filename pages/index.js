@@ -26,12 +26,12 @@ const gerarHtml = async (dados) => {
   let html = await res.text();
 
   html = html
-    .replace(/{{empresa}}/g, dados.clientName)
-    .replace(/{{cnpj}}/g, dados.cnpj)
-    .replace(/{{valor}}/g, dados.valor)
-    .replace(/{{contato}}/g, dados.email)
-    .replace(/{{periodo}}/g, dados.periodo || new Date().toLocaleString("pt-BR", { month: "long", year: "numeric" }))
-    .replace(/{{mensagem_adicional}}/g, dados.mensagem);
+  .replace(/{{\s*empresa\s*}}/g, dados.clientName)
+  .replace(/{{\s*cnpj\s*}}/g, dados.cnpj)
+  .replace(/{{\s*valor\s*}}/g, dados.valor)
+  .replace(/{{\s*contato\s*}}/g, dados.email)
+  .replace(/{{\s*periodo\s*}}/g, dados.periodo || new Date().toLocaleString("pt-BR", { month: "long", year: "numeric" }))
+  .replace(/{{\s*mensagem_adicional\s*}}/g, dados.mensagem);
 
   setPreviewHtml(html);
   return html;
