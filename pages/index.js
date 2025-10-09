@@ -5,6 +5,7 @@ export default function Home() {
   const [cnpj, setCnpj] = useState("");
   const [valor, setValor] = useState("");
   const [email, setEmail] = useState("");
+  const [periodo, setPeriodo] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [template, setTemplate] = useState("cliente");
   const [arquivo, setArquivo] = useState(null);
@@ -65,6 +66,7 @@ const gerarHtml = async () => {
         <input type="text" placeholder="CNPJ" value={cnpj} onChange={(e) => setCnpj(e.target.value)} />
         <input type="text" placeholder="Valor Total (ex: 1000,00)" value={valor} onChange={(e) => setValor(e.target.value)} />
         <input type="email" placeholder="E-mail Destinatário" value={email} onChange={(e) => setEmail(e.target.value)} />
+        <input type="text" placeholder="Período de Referência (ex: Setembro de 2025)" value={periodo} onChange={(e) => setPeriodo(e.target.value)} />
         <textarea placeholder="Mensagem Adicional" value={mensagem} onChange={(e) => setMensagem(e.target.value)} />
         <select value={template} onChange={(e) => setTemplate(e.target.value)}>
           <option value="cliente">Cliente</option>
