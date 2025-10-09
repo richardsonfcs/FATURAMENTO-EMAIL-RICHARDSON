@@ -37,7 +37,15 @@ const gerarHtml = async (dados) => {
   return html;
 };
   const handleSend = async () => {
-    const html = await gerarHtml();
+    const html = await gerarHtml({
+  clientName,
+  cnpj,
+  valor,
+  email,
+  periodo,
+  mensagem,
+  template,
+});
     let fileContent = null;
     let fileName = null;
 
