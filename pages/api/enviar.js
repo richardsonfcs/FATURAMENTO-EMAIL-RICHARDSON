@@ -7,39 +7,30 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
-  const { destinatario, assunto, corpo, dados, anexo } = req.body;
-
   try {
-    // Substitui placeholders no HTML
-    let htmlFinal = corpo;
-    if (dados && typeof dados === 'object') {
-      Object.keys(dados).forEach((chave) => {
-        const valor = dados[chave] || '';
-        const regex = new RegExp(`{{\\s*${chave}\\s*}}`, 'g');
-        htmlFinal = htmlFinal.replace(regex, valor);
-      });
-    }
+    const { to, subject, html, fileName, fileContent } = req.body;
 
     const emailData = {
       from: 'Faturamento <seu-email@dominio.com>',
-      to: destinatario,
-      subject: assunto,
-      html: htmlFinal,
+      to,
+      subject,
+      html,
     };
 
-    if (anexo) {
+    if (fileContent && fileName) {
       emailData.attachments = [
         {
-          filename: anexo.nome,
-          content: anexo.base64,
+          filename: fileName,
+          content: fileContent,
         },
       ];
     }
 
-    await resend.emails.send(emailData);
-    res.status(200).json({ sucesso: true });
+    const response = await resend.emails.send(emailData);
+
+    res.status(200).json({ ok: true, response });
   } catch (erro) {
     console.error('Erro ao enviar e-mail:', erro);
-    res.status(500).json({ erro: 'Falha ao enviar e-mail' });
+    res.status(500).json({ error: 'Falha ao enviar e-mail' });
   }
 }
