@@ -7,14 +7,24 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Método não permitido' });
   }
 
-  const { destinatario, assunto, corpo, anexo } = req.body;
+  const { destinatario, assunto, corpo, dados, anexo } = req.body;
 
   try {
+    // Substitui placeholders no HTML
+    let htmlFinal = corpo;
+    if (dados && typeof dados === 'object') {
+      Object.keys(dados).forEach((chave) => {
+        const valor = dados[chave] || '';
+        const regex = new RegExp(`{{\\s*${chave}\\s*}}`, 'g');
+        htmlFinal = htmlFinal.replace(regex, valor);
+      });
+    }
+
     const emailData = {
       from: 'Faturamento <seu-email@dominio.com>',
       to: destinatario,
       subject: assunto,
-      html: corpo,
+      html: htmlFinal,
     };
 
     if (anexo) {
