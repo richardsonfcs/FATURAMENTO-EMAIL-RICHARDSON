@@ -19,23 +19,23 @@ export default function Home() {
       reader.onerror = (err) => reject(err);
     });
 
-  // Gera HTML do template selecionado
-  const gerarHtml = async () => {
-    // fetch para /public/templates/
-    const res = await fetch(`/templates/${template}.html`);
-    let html = await res.text();
+ // Gera HTML do template selecionado
+const gerarHtml = async () => {
+  const res = await fetch(`/templates/${template}.html`);
+  let html = await res.text();
 
-    html = html
-      .replace(/{{ \$json\.clientName }}/g, clientName)
-      .replace(/{{ \$json\.reportData\.totalValue\.toFixed\(2\)\.replace\('\.', ','\) }}/g, valor)
-      .replace(/{{ \$now\.minus\({ months: 1 }\)\.setLocale\('pt-BR'\)\.toFormat\("MMMM 'de' yyyy"\) }}/g,
-        new Date().toLocaleString("pt-BR", { month: "long", year: "numeric" }))
-      .replace(/{{ mensagem_adicional }}/g, mensagem);
+  html = html
+    .replace(/{{empresa}}/g, clientName)
+    .replace(/{{cnpj}}/g, cnpj)
+    .replace(/{{valor}}/g, valor)
+    .replace(/{{contato}}/g, email)
+    .replace(/{{periodo}}/g,
+      new Date().toLocaleString("pt-BR", { month: "long", year: "numeric" }))
+    .replace(/{{mensagem_adicional}}/g, mensagem);
 
-    setPreviewHtml(html);
-    return html;
-  };
-
+  setPreviewHtml(html);
+  return html;
+};
   const handleSend = async () => {
     const html = await gerarHtml();
     let fileContent = null;
