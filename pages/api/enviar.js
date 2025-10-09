@@ -11,7 +11,7 @@ export default async function handler(req, res) {
     const { to, subject, html, fileName, fileContent } = req.body;
 
     const emailData = {
-      from: 'Faturamento <contato@richardsoncastro.com>',
+      from: 'Faturamento <faturamento@richardsoncastro.com>',
       to,
       subject,
       html,
