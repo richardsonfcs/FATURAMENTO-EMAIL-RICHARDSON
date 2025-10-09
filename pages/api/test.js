@@ -5,7 +5,7 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 export default async function handler(req, res) {
   try {
     const data = await resend.emails.send({
-      from: 'Faturamento <noreply@seudominio.com>',
+      from: 'Faturamento <faturamento@richardsoncastro.com>',
       to: 'seuemail@exemplo.com',
       subject: 'Teste Resend direto',
       html: '<strong>Teste de envio direto pela API</strong>',
