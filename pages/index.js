@@ -21,19 +21,18 @@ export default function Home() {
     });
 
  // Gera HTML do template selecionado
-const gerarHtml = async () => {
-  const res = await fetch(`/templates/${template}.html`);
+const gerarHtml = async (dados) => {
+  const res = await fetch(`/templates/${dados.template}.html`);
   let html = await res.text();
 
   html = html
-    .replace(/{{empresa}}/g, clientName)
-    .replace(/{{cnpj}}/g, cnpj)
-    .replace(/{{valor}}/g, valor)
-    .replace(/{{contato}}/g, email)
-    .replace(/{{periodo}}/g,
-      periodo || new Date().toLocaleString("pt-BR", { month: "long", year: "numeric" }))
-    .replace(/{{mensagem_adicional}}/g, mensagem);
-  
+    .replace(/{{empresa}}/g, dados.clientName)
+    .replace(/{{cnpj}}/g, dados.cnpj)
+    .replace(/{{valor}}/g, dados.valor)
+    .replace(/{{contato}}/g, dados.email)
+    .replace(/{{periodo}}/g, dados.periodo || new Date().toLocaleString("pt-BR", { month: "long", year: "numeric" }))
+    .replace(/{{mensagem_adicional}}/g, dados.mensagem);
+
   setPreviewHtml(html);
   return html;
 };
