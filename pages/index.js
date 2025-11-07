@@ -8,101 +8,46 @@ export default function Home() {
   const [periodo, setPeriodo] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [template, setTemplate] = useState("cliente");
-  const [arquivo, setArquivo] = useState(null);
   const [previewHtml, setPreviewHtml] = useState("");
 
-  // Converte PDF em base64
-  const fileToBase64 = (file) =>
-    new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => resolve(reader.result.split(",")[1]);
-      reader.onerror = (err) => reject(err);
-    });
-
-  // Gera HTML do template selecionado
-  const gerarHtml = async (dados) => {
+  // Gera o HTML substituindo os placeholders
+  const gerarHtml = async () => {
     try {
-      const res = await fetch(`/templates/${dados.template}.html`);
+      const res = await fetch(`/templates/${template}.html`);
       if (!res.ok) throw new Error("Template não encontrado.");
+
       let html = await res.text();
 
       html = html
-        .replace(/{{empresa}}/g, dados.clientName)
-        .replace(/{{cnpj}}/g, dados.cnpj)
-        .replace(/{{valor}}/g, dados.valor)
-        .replace(/{{contato}}/g, dados.email)
+        .replace(/{{empresa}}/g, clientName)
+        .replace(/{{cnpj}}/g, cnpj)
+        .replace(/{{valor}}/g, valor)
+        .replace(/{{contato}}/g, email)
         .replace(
           /{{periodo}}/g,
-          dados.periodo ||
-            new Date().toLocaleString("pt-BR", {
-              month: "long",
-              year: "numeric",
-            })
+          periodo.trim() !== ""
+            ? periodo
+            : new Date().toLocaleString("pt-BR", {
+                month: "long",
+                year: "numeric",
+              })
         )
-        .replace(/{{mensagem_adicional}}/g, dados.mensagem);
+        .replace(/{{mensagem_adicional}}/g, mensagem);
 
       setPreviewHtml(html);
-      return html;
     } catch (err) {
-      console.error("Erro ao gerar HTML:", err);
       alert("Erro ao gerar o HTML: " + err.message);
+      console.error(err);
     }
   };
 
-  const handleSend = async () => {
+  // Copia o HTML para a área de transferência
+  const copiarHtml = async () => {
     try {
-      console.log("Iniciando envio de e-mail...");
-
-      const html = await gerarHtml({
-        clientName,
-        cnpj,
-        valor,
-        email,
-        periodo,
-        mensagem,
-        template,
-      });
-
-      if (!html) throw new Error("HTML não foi gerado corretamente.");
-
-      let fileContent = null;
-      let fileName = null;
-
-      if (arquivo) {
-        fileContent = await fileToBase64(arquivo);
-        fileName = arquivo.name;
-      }
-
-      console.log("Enviando para API /api/enviar:", {
-        to: email,
-        subject: "Faturamento",
-        fileName,
-      });
-
-      const response = await fetch("/api/enviar", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          to: email,
-          subject: "Faturamento",
-          html,
-          fileName,
-          fileContent,
-        }),
-      });
-
-      const data = await response.json();
-      console.log("Resposta da API:", data);
-
-      if (data.ok) {
-        alert("✅ E-mail enviado com sucesso!");
-      } else {
-        alert("❌ Erro: " + data.error);
-      }
+      await navigator.clipboard.writeText(previewHtml);
+      alert("HTML copiado para a área de transferência!");
     } catch (err) {
-      console.error("Erro no envio:", err);
-      alert("Erro no envio: " + err.message);
+      alert("Erro ao copiar HTML.");
     }
   };
 
@@ -114,7 +59,8 @@ export default function Home() {
         fontFamily: "Arial, sans-serif",
       }}
     >
-      <h1>Envio de E-mails - Faturamento</h1>
+      <h1>Gerador de E-mails de Faturamento</h1>
+
       <div style={{ display: "flex", flexDirection: "column", gap: "15px" }}>
         <input
           type="text"
@@ -142,12 +88,12 @@ export default function Home() {
         />
         <input
           type="text"
-          placeholder="Período de Referência (ex: Setembro de 2025)"
+          placeholder="Período (ex: Setembro de 2025)"
           value={periodo}
           onChange={(e) => setPeriodo(e.target.value)}
         />
         <textarea
-          placeholder="Mensagem Adicional"
+          placeholder="Mensagem adicional"
           value={mensagem}
           onChange={(e) => setMensagem(e.target.value)}
         />
@@ -158,17 +104,13 @@ export default function Home() {
           <option value="cliente">Cliente</option>
           <option value="contabilidade">Contabilidade</option>
         </select>
-        <input
-          type="file"
-          accept="application/pdf"
-          onChange={(e) => setArquivo(e.target.files[0])}
-        />
-        <button onClick={handleSend}>Enviar E-mail</button>
+
+        <button onClick={gerarHtml}>Gerar HTML</button>
       </div>
 
       {previewHtml && (
         <div style={{ marginTop: "40px" }}>
-          <h2>Pré-visualização do HTML</h2>
+          <h2>Pré-visualização</h2>
           <iframe
             title="preview"
             srcDoc={previewHtml}
@@ -179,6 +121,20 @@ export default function Home() {
               borderRadius: "8px",
             }}
           />
+          <button
+            onClick={copiarHtml}
+            style={{
+              marginTop: "15px",
+              padding: "10px 20px",
+              background: "#0070f3",
+              color: "white",
+              border: "none",
+              borderRadius: "6px",
+              cursor: "pointer",
+            }}
+          >
+            Copiar HTML
+          </button>
         </div>
       )}
     </div>
